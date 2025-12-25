@@ -15,7 +15,7 @@ app = Flask(__name__)
 # --- 1. SECURITY CONFIGURATION ---
 
 # A. Strict CORS
-ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000", "https://threatsys-cms-frontend.vercel.app/"]
+ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000", "https://threatsys-cms-frontend.vercel.app"]
 CORS(app, resources={r"/api/*": {"origins": ALLOWED_ORIGINS}})
 
 # B. Admin Secret Key (Now fetched from .env)
