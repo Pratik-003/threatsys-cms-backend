@@ -1,9 +1,13 @@
+import os
 from pymongo import MongoClient
+from dotenv import load_dotenv
 
-# 1. Connect to MongoDB
-client = MongoClient("mongodb+srv://maharanapratik600_db_user:iZpG6TsJjNkH0cfd@threatsyscluster.lgp7wyz.mongodb.net/?retryWrites=true&w=majority&appName=ThreatsysCluster")
+load_dotenv() # Load variables
+
+mongo_uri = os.getenv("MONGO_URI")
+client = MongoClient(mongo_uri)
+
 db = client["threatsys_cms"]
-collection = db["pages"]
 
 # 2. Define the Full Data Structure
 data = [

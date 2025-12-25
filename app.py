@@ -4,25 +4,38 @@ from flask import Flask, request, jsonify, abort
 from flask_cors import CORS
 from pymongo import MongoClient
 from functools import wraps
+from dotenv import load_dotenv  # <--- NEW IMPORT
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
 # --- 1. SECURITY CONFIGURATION ---
 
-# A. Strict CORS: Only allow your Frontend (Next.js) to talk to this API
-# In production, change this to your actual domain (e.g., https://threatsys.co.in)
-ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
+# A. Strict CORS
+ALLOWED_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000", "https://threatsys-cms.vercel.app"]
 CORS(app, resources={r"/api/*": {"origins": ALLOWED_ORIGINS}})
 
-# B. Admin Secret Key (In production, use os.getenv('ADMIN_SECRET'))
-# This ensures that even if someone finds the API URL, they can't edit data without this key.
-ADMIN_SECRET_KEY = "threatsys_super_secure_key_2025"
+# B. Admin Secret Key (Now fetched from .env)
+# The 'get' method allows a default value fallback if the key is missing
+ADMIN_SECRET_KEY = os.getenv("ADMIN_SECRET", "default_insecure_key_do_not_use")
 
 # --- 2. DATABASE CONNECTION ---
-client = MongoClient("mongodb+srv://maharanapratik600_db_user:iZpG6TsJjNkH0cfd@threatsyscluster.lgp7wyz.mongodb.net/?retryWrites=true&w=majority&appName=ThreatsysCluster")
-db = client["threatsys_cms"]
-pages_collection = db["pages"]
-cert_collection = db["certificates"]
+# Now fetched from .env
+mongo_uri = os.getenv("MONGO_URI")
+
+if not mongo_uri:
+    print("❌ ERROR: MongoDB URI is missing from .env file!")
+else:
+    try:
+        client = MongoClient(mongo_uri)
+        db = client["threatsys_cms"]
+        pages_collection = db["pages"]
+        cert_collection = db["certificates"]
+        print("✅ MongoDB Connected Successfully")
+    except Exception as e:
+        print(f"❌ MongoDB Connection Failed: {e}")
 
 # --- 3. SECURITY MIDDLEWARE ---
 
