@@ -1,5 +1,6 @@
 import os
 import re
+import certifi
 from flask import Flask, request, jsonify, abort
 from flask_cors import CORS
 from pymongo import MongoClient
@@ -26,13 +27,18 @@ ADMIN_SECRET_KEY = os.getenv("ADMIN_SECRET", "default_insecure_key_do_not_use")
 mongo_uri = os.getenv("MONGO_URI")
 
 if not mongo_uri:
-    print("❌ ERROR: MongoDB URI is missing from .env file!")
+    print("❌ ERROR: MongoDB URI is missing!")
 else:
     try:
-        client = MongoClient(mongo_uri)
+        # --- 2. ADD tlsCAFile=certifi.where() HERE ---
+        client = MongoClient(mongo_uri, tlsCAFile=certifi.where())
+        
         db = client["threatsys_cms"]
         pages_collection = db["pages"]
         cert_collection = db["certificates"]
+        
+        # Test the connection immediately
+        client.admin.command('ping')
         print("✅ MongoDB Connected Successfully")
     except Exception as e:
         print(f"❌ MongoDB Connection Failed: {e}")
